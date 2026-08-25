@@ -229,6 +229,12 @@
     margin-top:22px;
     letter-spacing:.02em;
   }
+  .footer-note a{
+    color:var(--accent);
+    font-weight:700;
+    text-decoration:none;
+  }
+  .footer-note a:hover{ text-decoration:underline; }
 
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; }
@@ -287,13 +293,13 @@
     </form>
   </main>
 
-  <div class="footer-note">창순기획 · 익명 제출 가능</div>
+  <div class="footer-note">창순기획 · 익명 제출 가능 · <a href="board.html">다른 의견 보러가기 →</a></div>
 </div>
 
 <script>
 (function(){
   // ⚠ Apps Script 배포 후 발급되는 웹앱 URL(.../exec)로 반드시 교체하세요.
-  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxZDKg89JG7Ur_hiT61AFrzyPrX6s9pWfIL9uFhSGvlCkBH6uMZx1O2iRkrHjE37KS6yw/exec';
+  const WEB_APP_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
 
   const grid = document.getElementById('category-grid');
   const catButtons = Array.from(grid.querySelectorAll('.category-btn'));
