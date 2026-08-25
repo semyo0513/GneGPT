@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>창순기획 피드백함</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EAEFF6;
+    --bg-grid: #DCE3EE;
+    --card-bg: #FFFFFF;
+    --ink: #1F2937;
+    --muted: #6B7280;
+    --clip-1: #B9C2D0;
+    --clip-2: #6B7488;
+    --error-tag: #E0604C;
+    --improve-tag: #23928A;
+    --etc-tag: #64748B;
+    --tip-tag: #D99A2B;
+    --accent: #3E4FBF;
+    --accent-ink: #FFFFFF;
+    --danger: #C23B33;
+    --ok: #1F8A5C;
+    --radius-card: 16px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Pretendard', -apple-system, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 1px 1px, var(--bg-grid) 1px, transparent 1px) 0 0/22px 22px,
+      var(--bg);
+    display:flex;
+    justify-content:center;
+    padding:36px 16px 60px;
+  }
+
+  .page{ width:100%; max-width:440px; }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    color:var(--muted);
+    text-align:center;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+
+  .clip{
+    width:104px;
+    height:40px;
+    margin:0 auto -16px;
+    position:relative;
+    border-radius:9px 9px 3px 3px;
+    background:linear-gradient(160deg, #C7CFDB 0%, var(--clip-1) 40%, var(--clip-2) 100%);
+    box-shadow:0 6px 12px rgba(31,41,55,.18);
+  }
+  .clip::before{
+    content:'';
+    position:absolute;
+    top:12px; left:50%; transform:translateX(-50%);
+    width:13px; height:13px;
+    border-radius:50%;
+    background:var(--bg);
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.35);
+  }
+
+  .board{
+    background:var(--card-bg);
+    border-radius:var(--radius-card);
+    padding:38px 22px 26px;
+    box-shadow:0 22px 40px rgba(31,41,55,.14), 0 3px 10px rgba(31,41,55,.06);
+    transform:rotate(-.35deg);
+    position:relative;
+  }
+
+  h1{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:-.01em;
+    margin:0 0 4px;
+    text-align:center;
+  }
+  .subtitle{
+    font-size:13px;
+    color:var(--muted);
+    text-align:center;
+    margin:0 0 26px;
+    line-height:1.5;
+  }
+
+  .field-label{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    font-size:13px;
+    font-weight:700;
+    margin:0 0 10px;
+  }
+  .field-label .req{ color:var(--error-tag); font-size:12px; }
+  .field-label .opt{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    font-weight:500;
+    color:var(--muted);
+    background:#F1F3F8;
+    padding:2px 6px;
+    border-radius:5px;
+  }
+
+  fieldset{ border:none; padding:0; margin:0 0 22px; }
+  legend{ padding:0; width:100%; }
+
+  .category-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .category-btn{
+    appearance:none;
+    border:2px solid transparent;
+    border-radius:11px;
+    padding:14px 8px;
+    color:#fff;
+    font-family:'Pretendard', sans-serif;
+    font-size:13.5px;
+    font-weight:700;
+    line-height:1.3;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    filter:saturate(.92);
+  }
+  .category-btn .ic{ font-size:18px; }
+  .category-btn[data-cat="오류사항"]{ background:var(--error-tag); }
+  .category-btn[data-cat="개선요청"]{ background:var(--improve-tag); }
+  .category-btn[data-cat="기타"]{ background:var(--etc-tag); }
+  .category-btn[data-cat="우수 활용팁 공유"]{ background:var(--tip-tag); }
+  .category-btn:hover{ filter:saturate(1.05); }
+  .category-btn.selected{
+    transform:translateY(-3px) rotate(-1deg);
+    box-shadow:0 10px 18px rgba(31,41,55,.22);
+    border-color:var(--ink);
+    filter:saturate(1.1);
+  }
+  .category-btn:focus-visible{ outline:3px solid var(--ink); outline-offset:2px; }
+
+  input[type="text"], textarea{
+    width:100%;
+    font-family:'Pretendard', sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    background:#F8F9FC;
+    border:1.5px solid #E3E7EF;
+    border-radius:10px;
+    padding:12px 13px;
+    resize:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  input[type="text"]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    background:#fff;
+  }
+  textarea{ min-height:132px; line-height:1.55; }
+
+  .counter{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    text-align:right;
+    margin-top:6px;
+  }
+  .counter.warn{ color:var(--danger); }
+
+  /* 허니팟 - 실제 사용자에게는 보이지 않음 */
+  .hp-field{ position:absolute; left:-9999px; top:-9999px; opacity:0; }
+
+  .submit-btn{
+    width:100%;
+    margin-top:6px;
+    padding:15px;
+    border:none;
+    border-radius:11px;
+    background:var(--accent);
+    color:var(--accent-ink);
+    font-family:'Pretendard', sans-serif;
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:-.01em;
+    cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  .submit-btn:hover{ transform:translateY(-1px); }
+  .submit-btn:active{ transform:translateY(0); }
+  .submit-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+  .status-msg{
+    display:none;
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.5;
+  }
+  .status-msg.show{ display:block; }
+  .status-msg.ok{ background:#E9F7EF; color:var(--ok); }
+  .status-msg.error{ background:#FBEAE8; color:var(--danger); }
+
+  .footer-note{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    margin-top:22px;
+    letter-spacing:.02em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">SUGGESTION BOX · 창순기획</div>
+  <div class="clip"></div>
+
+  <main class="board">
+    <h1>피드백함</h1>
+    <p class="subtitle">오류·개선점·활용팁, 무엇이든 편하게 남겨 주세요.<br>이름은 적지 않아도 됩니다.</p>
+
+    <form id="feedback-form" novalidate>
+
+      <fieldset>
+        <legend class="field-label">카테고리 <span class="req">*</span></legend>
+        <div class="category-grid" id="category-grid" role="radiogroup" aria-label="카테고리 선택">
+          <button type="button" class="category-btn" data-cat="오류사항" role="radio" aria-checked="false">
+            <span class="ic">🐛</span>오류사항
+          </button>
+          <button type="button" class="category-btn" data-cat="개선요청" role="radio" aria-checked="false">
+            <span class="ic">💡</span>개선요청
+          </button>
+          <button type="button" class="category-btn" data-cat="기타" role="radio" aria-checked="false">
+            <span class="ic">💬</span>기타
+          </button>
+          <button type="button" class="category-btn" data-cat="우수 활용팁 공유" role="radio" aria-checked="false">
+            <span class="ic">⭐</span>우수 활용팁 공유
+          </button>
+        </div>
+      </fieldset>
+
+      <div style="margin-bottom:22px;">
+        <label class="field-label" for="name-input">이름 <span class="opt">선택 · 익명 가능</span></label>
+        <input type="text" id="name-input" maxlength="30" placeholder="예: 3학년 2반 / 김OO (비워도 됨)">
+      </div>
+
+      <div style="margin-bottom:6px;">
+        <label class="field-label" for="content-input">내용 <span class="req">*</span></label>
+        <textarea id="content-input" maxlength="2000" placeholder="어떤 부분이 불편했는지, 어떻게 바뀌면 좋을지 자유롭게 적어 주세요."></textarea>
+        <div class="counter" id="char-counter">0 / 2000</div>
+      </div>
+
+      <!-- 스팸 방지용 허니팟: 사람 눈에는 보이지 않음 -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">제출하기</button>
+
+      <div class="status-msg" id="status-msg" role="status"></div>
+    </form>
+  </main>
+
+  <div class="footer-note">창순기획 · 익명 제출 가능</div>
+</div>
+
+<script>
+(function(){
+  // ⚠ Apps Script 배포 후 발급되는 웹앱 URL(.../exec)로 반드시 교체하세요.
+  const WEB_APP_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+  const grid = document.getElementById('category-grid');
+  const catButtons = Array.from(grid.querySelectorAll('.category-btn'));
+  const form = document.getElementById('feedback-form');
+  const nameInput = document.getElementById('name-input');
+  const contentInput = document.getElementById('content-input');
+  const counter = document.getElementById('char-counter');
+  const submitBtn = document.getElementById('submit-btn');
+  const statusMsg = document.getElementById('status-msg');
+  const honeypot = document.getElementById('website');
+
+  let selectedCategory = '';
+
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catButtons.forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-checked','false'); });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-checked','true');
+      selectedCategory = btn.dataset.cat;
+    });
+  });
+
+  contentInput.addEventListener('input', () => {
+    const len = contentInput.value.length;
+    counter.textContent = len + ' / 2000';
+    counter.classList.toggle('warn', len > 1900);
+  });
+
+  function showStatus(type, message){
+    statusMsg.textContent = message;
+    statusMsg.className = 'status-msg show ' + type;
+  }
+
+  function resetForm(){
+    form.reset();
+    catButtons.forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-checked','false'); });
+    selectedCategory = '';
+    counter.textContent = '0 / 2000';
+    counter.classList.remove('warn');
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    statusMsg.className = 'status-msg';
+
+    if (!selectedCategory){
+      showStatus('error', '카테고리를 선택해 주세요.');
+      return;
+    }
+    const content = contentInput.value.trim();
+    if (!content){
+      showStatus('error', '내용을 입력해 주세요.');
+      return;
+    }
+    if (WEB_APP_URL.indexOf('YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') !== -1){
+      showStatus('error', '관리자 설정이 필요합니다 (WEB_APP_URL 미설정).');
+      return;
+    }
+
+    const payload = {
+      category: selectedCategory,
+      name: nameInput.value.trim(),
+      content: content,
+      website: honeypot.value // 허니팟 값 (정상 사용자는 항상 빈 값)
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '제출 중...';
+
+    // GAS doPost의 CORS 프리플라이트 회피를 위해 Content-Type을 지정하지 않음(text/plain 기본값)
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success){
+          showStatus('ok', '제출이 완료되었습니다. 소중한 의견 감사합니다!');
+          resetForm();
+        } else {
+          showStatus('error', data.message || '제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        }
+      })
+      .catch(() => {
+        showStatus('error', '네트워크 오류로 제출하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '제출하기';
+      });
+  });
+})();
+</script>
+</body>
+</html>
